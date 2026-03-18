@@ -1,13 +1,29 @@
 import chess
+import chess.engine
 
-board = chess.Board()
+import sys
 
-engine = chess.engine.SimpleEngine.popen_uci(
-    "C:/Users/thakkars/Desktop/stockfish/stockfish-windows-x86-64-avx2.exe"
-)
+# Standard Algebric Notation (SAN)
+# Universal Chess Interface (UCI)
 
-board = chess.Board()
-result = engine.analyse(board, chess.engine.Limit(depth=10))
-print(result["score"].white().score())
+# Download Stockfish from https://stockfishchess.org/download/
 
-engine.quit()
+with chess.engine.SimpleEngine.popen_uci("STOCKFISH") as engine:
+    board = chess.Board()
+    result = engine.analyse(board, chess.engine.Limit(depth=15))
+
+    result = str(result["score"]).replace('PovScore(', '').replace('(', ',').replace('', '').replace(')', '').replace(' ', '')
+
+    unit, eval, color = result.split(',')
+
+    moves = []
+
+    while True:
+        move = input("move: ")
+
+        try:
+            chess.Move.from_san("move")
+        except:
+            sys.exit('Please enter a Valid mmove')
+
+        moves.append(move)
