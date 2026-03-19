@@ -9,8 +9,9 @@ board = [
     ['', '', '', '', '', '', ''],
     ['', '', '', '', '', '', ''],
     ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
     ['', '', '', '', '', '', '']
-]
+]   
 
 heights = [0] * COLS
 
@@ -68,6 +69,14 @@ def evaluate(board):
 
 # ---------------- MINIMAX ----------------
 def minimax(board, heights, depth, maximizing):
+
+    moves = get_valid_moves(heights)
+
+    if moves == []:
+        return None, evaluate(board)
+
+    if depth == 0 or check_winner(board):
+        return None, evaluate(board)
 
     if depth == 0 or check_winner(board):
         return None, evaluate(board)
