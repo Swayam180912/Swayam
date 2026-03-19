@@ -1,52 +1,65 @@
-import chess
-import chess.engine
-
 import sys
+import math
 
-STOCKFISH_PATH = 'STOCKFISH_PATH'
+board = [
+    ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '']
+]
 
-board = chess.Board()
+for row in board:
+    print(f'{row}\n')
 
-with chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH) as engine:
+heights = [0, 0, 0, 0, 0, 0, 0]
 
-    while not board.is_game_over():
-        user_input = input("Your move (SAN or UCI): ").strip()
+def check_winner(board):
+    ROWS = 6
+    COLS = 7
 
-        if user_input == 'resign':
-            sys.exit('Game Over! Result: 0-1')
+    # Horizontal
+    for r in range(ROWS):
+        for c in range(COLS - 3):
+            if board[r][c] != '' and board[r][c] == board[r][c+1] == board[r][c+2] == board[r][c+3]:
+                return board[r][c]
 
-        move = None
+    # Vertical
+    for r in range(ROWS - 3):
+        for c in range(COLS):
+            if board[r][c] != '' and board[r][c] == board[r+1][c] == board[r+2][c] == board[r+3][c]:
+                return board[r][c]
 
-        # Try SAN first
-        try:
-            move = board.parse_san(user_input)
-        except ValueError:
-            pass
+    # Diagonal (down-right)
+    for r in range(ROWS - 3):
+        for c in range(COLS - 3):
+            if board[r][c] != '' and board[r][c] == board[r+1][c+1] == board[r+2][c+2] == board[r+3][c+3]:
+                return board[r][c]
 
-        # If SAN fails, try UCI
-        if move is None:
-            try:
-                move = chess.Move.from_uci(user_input)
-            except ValueError:
-                pass
+    # Diagonal (down-left)
+    for r in range(ROWS - 3):
+        for c in range(3, COLS):
+            if board[r][c] != '' and board[r][c] == board[r+1][c-1] == board[r+2][c-2] == board[r+3][c-3]:
+                return board[r][c]
 
-        # Check if move is legal
-        if move not in board.legal_moves:
-            print("Illegal move! Try again.")
-            continue
+    return None
 
-        # Push user move
-        board.push(move)
+while True:
+    user_input = int(input('Move (1-7): '))
 
-        # Check game over
-        if board.is_game_over():
-            break
+    if user_input not in [1,2,3,4,5,6,7]:
+        sys.exit('Invalid Input')
 
-        # Stockfish move
-        stockans = engine.play(board, chess.engine.Limit(time=1))
-        stockmove = stockans.move
-        print(f"Stockfish plays: {board.san(stockmove)}")
-        board.push(stockmove)
+    col = user_input - 1
 
-# Print final result
-print(f"Game over! Result: {board.result()}")
+    if heights[col] >= 6:
+        sys.exit('Column full')
+
+    board[5 - heights[col]][col] = 'x'
+    heights[col] += 1
+
+    winner = check_winner(board)
+
+    if winner:
+        sys.exit(f'{winner} wins!')
