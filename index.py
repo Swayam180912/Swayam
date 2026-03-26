@@ -1,143 +1,88 @@
-import sys
-import math
+import json
+import os
 
-ROWS = 6
-COLS = 7
+FILE_NAME = "accounts.json"
 
-board = [
-    ['', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '']
-]   
+# Load data from file
+def load_data():
+    if not os.path.exists(FILE_NAME):
+        return {}
+    with open(FILE_NAME, "r") as f:
+        return json.load(f)
 
-heights = [0] * COLS
+# Save data to file
+def save_data(data):
+    with open(FILE_NAME, "w") as f:
+        json.dump(data, f)
 
+# Register user
+def register(data):
+    username = input("Enter username: ")
+    if username in data:
+        print("Username already exists!")
+        return
+    
+    password = input("Enter password: ")
+    data[username] = {
+        "password": password,
+        "watchlist": []
+    }
+    save_data(data)
+    print("Account created!")
 
-# ---------------- WIN CHECK ----------------
-def check_winner(board):
-    for r in range(ROWS):
-        for c in range(COLS - 3):
-            if board[r][c] != '' and board[r][c] == board[r][c+1] == board[r][c+2] == board[r][c+3]:
-                return board[r][c]
+# Login user
+def login(data):
+    username = input("Enter username: ")
+    password = input("Enter password: ")
 
-    for r in range(ROWS - 3):
-        for c in range(COLS):
-            if board[r][c] != '' and board[r][c] == board[r+1][c] == board[r+2][c] == board[r+3][c]:
-                return board[r][c]
-
-    return None
-
-
-# ---------------- VALID MOVES ----------------
-def get_valid_moves(heights):
-    moves = []
-    for c in range(COLS):
-        if heights[c] < ROWS:
-            moves.append(c)
-    return moves
-
-
-# ---------------- MAKE MOVE ----------------
-def make_move(board, heights, col, piece):
-    new_board = []
-    for row in board:
-        new_board.append(row[:])
-
-    new_heights = heights[:]
-
-    row = ROWS - 1 - new_heights[col]
-    new_board[row][col] = piece
-    new_heights[col] += 1
-
-    return new_board, new_heights
-
-
-# ---------------- EVALUATE ----------------
-def evaluate(board):
-    winner = check_winner(board)
-
-    if winner == 'o':
-        return 1000
-    if winner == 'x':
-        return -1000
-
-    return 0
-
-
-# ---------------- MINIMAX ----------------
-def minimax(board, heights, depth, maximizing):
-
-    moves = get_valid_moves(heights)
-
-    if moves == []:
-        return None, evaluate(board)
-
-    if depth == 0 or check_winner(board):
-        return None, evaluate(board)
-
-    if depth == 0 or check_winner(board):
-        return None, evaluate(board)
-
-    moves = get_valid_moves(heights)
-
-    if maximizing:
-        best_score = -math.inf
-        best_col = moves[0]
-
-        for col in moves:
-            new_board, new_heights = make_move(board, heights, col, 'o')
-            _, score = minimax(new_board, new_heights, depth - 1, False)
-
-            if score > best_score:
-                best_score = score
-                best_col = col
-
-        return best_col, best_score
-
+    if username in data and data[username]["password"] == password:
+        print("Login successful!")
+        user_menu(data, username)
     else:
-        best_score = math.inf
-        best_col = moves[0]
+        print("Invalid credentials!")
 
-        for col in moves:
-            new_board, new_heights = make_move(board, heights, col, 'x')
-            _, score = minimax(new_board, new_heights, depth - 1, True)
+# User menu after login
+def user_menu(data, username):
+    while True:
+        print("\n1. Add word to watchlist")
+        print("2. View watchlist")
+        print("3. Logout")
 
-            if score < best_score:
-                best_score = score
-                best_col = col
+        choice = input("Choose: ")
 
-        return best_col, best_score
+        if choice == "1":
+            word = input("Enter word: ")
+            data[username]["watchlist"].append(word)
+            save_data(data)
+            print("Added!")
 
+        elif choice == "2":
+            print("Your watchlist:", data[username]["watchlist"])
 
-# ---------------- GAME LOOP ----------------
-while True:
+        elif choice == "3":
+            break
 
-    col = int(input("Move (1-7): ")) - 1
+        else:
+            print("Invalid choice")
 
-    if col not in range(7) or heights[col] >= 6:
-        sys.exit("Invalid move")
+# Main program
+def main():
+    data = load_data()
 
-    # player move
-    board[ROWS - 1 - heights[col]][col] = 'x'
-    heights[col] += 1
+    while True:
+        print("\n1. Register")
+        print("2. Login")
+        print("3. Exit")
 
-    if check_winner(board):
-        print("x wins!")
-        break
+        choice = input("Choose: ")
 
-    # AI move
-    col, _ = minimax(board, heights, 3, True)
+        if choice == "1":
+            register(data)
+        elif choice == "2":
+            login(data)
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice")
 
-    board, heights = make_move(board, heights, col, 'o')
-
-    print("AI plays:", col + 1)
-
-    for row in board:
-        print(row)
-
-    if check_winner(board):
-        print("o wins!")
-        break
+main()
