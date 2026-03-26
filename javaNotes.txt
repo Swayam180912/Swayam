@@ -1,0 +1,11 @@
+CONVERSION
+
+From → To	                                    Code
+
+String → int	                          Integer.parseInt(s)
+String → float	                          Float.parseFloat(s)
+String → boolean	                      Boolean.parseBoolean(s)
+int → float	                              (float) x
+float → int	                              (int) x
+int → String	                          String.valueOf(x)
+float → String	                          String.valueOf(x)
