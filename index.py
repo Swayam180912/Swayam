@@ -19,7 +19,7 @@ def open_dashboard(user_data):
         
         for widget in root.winfo_children():
             widget.destroy()
-            
+
         register = tk.Button(text='Register', width=13, command=register_command)
         register.place(x=1080,y=30)
 
@@ -194,7 +194,12 @@ def login_command():
                 open_dashboard(user)
                 return
 
-        print("Invalid username or password")
+        error_label = tk.Label(login_frame, text="", fg="red")
+        error_label.place(x=50, y=150)
+        error_label.config(text='Invalid username or password')
+
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
 
     login_btn = tk.Button(login_frame, text="Login", command=check_login)
     login_btn.place(x=120, y=120)
