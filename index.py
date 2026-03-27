@@ -1,88 +1,85 @@
+import tkinter as tk
+
 import json
 import os
 
-FILE_NAME = "accounts.json"
+root = tk.Tk()
+root.geometry('2000x700')
+root.title('Dynamicity')
 
-# Load data from file
-def load_data():
-    if not os.path.exists(FILE_NAME):
-        return {}
-    with open(FILE_NAME, "r") as f:
-        return json.load(f)
+def register_command():
+    register_frame = tk.Frame()
+    register_frame.pack(fill='both', expand=True)
 
-# Save data to file
-def save_data(data):
-    with open(FILE_NAME, "w") as f:
-        json.dump(data, f)
+    username_label = tk.Label(text='Username: ')
+    username_label.place(x=50, y=50)
+    username_entry = tk.Entry()
+    username_entry.place(x=120, y=50)
 
-# Register user
-def register(data):
-    username = input("Enter username: ")
-    if username in data:
-        print("Username already exists!")
-        return
-    
-    password = input("Enter password: ")
-    data[username] = {
-        "password": password,
-        "watchlist": []
-    }
-    save_data(data)
-    print("Account created!")
+    password_label = tk.Label(text='Password: ')
+    password_label.place(x=50, y=80)
+    password_entry = tk.Entry()
+    password_entry.place(x=120 ,y=80)
 
-# Login user
-def login(data):
-    username = input("Enter username: ")
-    password = input("Enter password: ")
+    firstname_label = tk.Label(text='First Name: ')
+    firstname_label.place(x=50, y=110)
+    firstname_entry = tk.Entry()
+    firstname_entry.place(x=120 ,y=110)
 
-    if username in data and data[username]["password"] == password:
-        print("Login successful!")
-        user_menu(data, username)
-    else:
-        print("Invalid credentials!")
+    lastname_label = tk.Label(text='Last Name: ')
+    lastname_label.place(x=50, y=140)
+    lastname_entry = tk.Entry()
+    lastname_entry.place(x=120 ,y=140)
 
-# User menu after login
-def user_menu(data, username):
-    while True:
-        print("\n1. Add word to watchlist")
-        print("2. View watchlist")
-        print("3. Logout")
+    email_label = tk.Label(text='email: ')
+    email_label.place(x=50, y=170)
+    email_entry = tk.Entry()
+    email_entry.place(x=120 ,y=170)
 
-        choice = input("Choose: ")
+    def signin_command():
+        user_data = {
+            "username": username_entry.get(),
+            "password": password_entry.get(),
+            "first_name": firstname_entry.get(),
+            "last_name": lastname_entry.get(),
+            "email": email_entry.get()
+        }
 
-        if choice == "1":
-            word = input("Enter word: ")
-            data[username]["watchlist"].append(word)
-            save_data(data)
-            print("Added!")
+        file_name = "users.json"
 
-        elif choice == "2":
-            print("Your watchlist:", data[username]["watchlist"])
-
-        elif choice == "3":
-            break
-
+        # Check if file exists
+        if os.path.exists(file_name):
+            with open(file_name, "r") as file:
+                try:
+                    data = json.load(file)
+                except:
+                    data = []
         else:
-            print("Invalid choice")
+            data = []
 
-# Main program
-def main():
-    data = load_data()
+        # Add new user
+        data.append(user_data)
 
-    while True:
-        print("\n1. Register")
-        print("2. Login")
-        print("3. Exit")
+        # Write back to file
+        with open(file_name, "w") as file:
+            json.dump(data, file, indent=4)
 
-        choice = input("Choose: ")
+        print("User registered successfully!")
+        signin.config(state=tk.DISABLED)
 
-        if choice == "1":
-            register(data)
-        elif choice == "2":
-            login(data)
-        elif choice == "3":
-            break
-        else:
-            print("Invalid choice")
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
+        firstname_entry.delete(0, tk.END)
+        lastname_entry.delete(0, tk.END)
+        email_entry.delete(0, tk.END)
 
-main()
+    signin = tk.Button(text='sign in', command=signin_command)
+    signin.place(x=200, y=200)
+
+register = tk.Button(text='Register', width=13, command=register_command)
+register.place(x=1080,y=30)
+
+login = tk.Button(text='Login', width=13)
+login.place(x=1200, y=30)
+
+root.mainloop()
