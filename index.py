@@ -15,9 +15,20 @@ def open_dashboard(user_data):
     dashboard_frame = tk.Frame(root)
     dashboard_frame.pack(fill='both', expand=True)
 
+    def logout():
+        
+        for widget in root.winfo_children():
+            widget.destroy()
+            
+        register = tk.Button(text='Register', width=13, command=register_command)
+        register.place(x=1080,y=30)
+
+        login = tk.Button(text='Login', width=13, command=login_command)
+        login.place(x=1200, y=30)
+
     # Top bar
-    profile_btn = tk.Button(dashboard_frame, text="Profile")
-    profile_btn.pack(anchor='ne', padx=20, pady=10)
+    logout_button = tk.Button(dashboard_frame, text="Logout", command=logout)
+    logout_button.pack(anchor='ne', padx=20, pady=10)
 
     # Title
     title = tk.Label(dashboard_frame, text=f"{user_data['username']}'s Watchlist", font=("Arial", 20))
@@ -93,18 +104,19 @@ def register_command():
     email_entry = tk.Entry()
     email_entry.place(x=120 ,y=170)
 
+    error_label = tk.Label(register_frame, text="", fg="red")
+    error_label.place(x=50, y=230)
+
     def signin_command():
-        user_data = {
-            "username": username_entry.get(),
-            "password": password_entry.get(),
-            "first_name": firstname_entry.get(),
-            "last_name": lastname_entry.get(),
-            "email": email_entry.get()
-        }
+        username = username_entry.get()
+        password = password_entry.get()
+        first_name = firstname_entry.get()
+        last_name = lastname_entry.get()
+        email = email_entry.get()
 
         file_name = "users.json"
 
-        # Check if file exists
+        # Load existing users
         if os.path.exists(file_name):
             with open(file_name, "r") as file:
                 try:
@@ -114,24 +126,33 @@ def register_command():
         else:
             data = []
 
-        # Add new user
+        for user in data:
+            if user["username"] == username:
+                error_label.config(text="Username already taken!")
+                return
+            if user["email"] == email:
+                error_label.config(text="Email already in use!")
+                return
+
+        user_data = {
+            "username": username,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "watchlist": []
+        }
+
         data.append(user_data)
 
-        # Write back to file
         with open(file_name, "w") as file:
             json.dump(data, file, indent=4)
 
-        print("User registered successfully!")
-        signin.config(state=tk.DISABLED)
+        error_label.config(text="Account created!", fg="green")
 
-        username_entry.delete(0, tk.END)
-        password_entry.delete(0, tk.END)
-        firstname_entry.delete(0, tk.END)
-        lastname_entry.delete(0, tk.END)
-        email_entry.delete(0, tk.END)
-
+        # Go to dashboard
         open_dashboard(user_data)
-
+        
     signin = tk.Button(text='sign in', command=signin_command)
     signin.place(x=200, y=200)
 
