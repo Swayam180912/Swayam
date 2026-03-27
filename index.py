@@ -136,15 +136,54 @@ def register_command():
     signin.place(x=200, y=200)
 
 
+def login_command():
+    # Clear screen
+    for widget in root.winfo_children():
+        widget.destroy()
 
-def signin_command():
-    ...
+    login_frame = tk.Frame(root)
+    login_frame.pack(fill='both', expand=True)
+
+    username_label = tk.Label(login_frame, text='Username:')
+    username_label.place(x=50, y=50)
+    username_entry = tk.Entry(login_frame)
+    username_entry.place(x=120, y=50)
+
+    password_label = tk.Label(login_frame, text='Password:')
+    password_label.place(x=50, y=80)
+    password_entry = tk.Entry(login_frame, show="*")
+    password_entry.place(x=120, y=80)
+
+    def check_login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        file_name = "users.json"
+
+        if not os.path.exists(file_name):
+            print("No user found")
+            return
+
+        with open(file_name, "r") as file:
+            data = json.load(file)
+
+        for user in data:
+            if user["username"] == username and user["password"] == password:
+                print("Login successful!")
+                open_dashboard(user)
+                return
+
+        print("Invalid username or password")
+
+    login_btn = tk.Button(login_frame, text="Login", command=check_login)
+    login_btn.place(x=120, y=120)
+
 
 
 register = tk.Button(text='Register', width=13, command=register_command)
 register.place(x=1080,y=30)
 
-login = tk.Button(text='Login', width=13)
+login = tk.Button(text='Login', width=13, command=login_command)
 login.place(x=1200, y=30)
 
 root.mainloop()
