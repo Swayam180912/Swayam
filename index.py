@@ -7,6 +7,63 @@ root = tk.Tk()
 root.geometry('2000x700')
 root.title('Dynamicity')
 
+def open_dashboard(user_data):
+    # Clear window
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    dashboard_frame = tk.Frame(root)
+    dashboard_frame.pack(fill='both', expand=True)
+
+    # Top bar
+    profile_btn = tk.Button(dashboard_frame, text="Profile")
+    profile_btn.pack(anchor='ne', padx=20, pady=10)
+
+    # Title
+    title = tk.Label(dashboard_frame, text=f"{user_data['username']}'s Watchlist", font=("Arial", 20))
+    title.pack(pady=20)
+
+    # Watchlist display
+    watchlist_box = tk.Listbox(dashboard_frame, width=50, height=15)
+    watchlist_box.pack(pady=10)
+
+    # Load existing watchlist (if exists)
+    if "watchlist" in user_data:
+        for word in user_data["watchlist"]:
+            watchlist_box.insert(tk.END, word)
+
+    # Entry to add word
+    word_entry = tk.Entry(dashboard_frame)
+    word_entry.pack(pady=5)
+
+    # Add word function
+    def add_word():
+        word = word_entry.get()
+        if word:
+            watchlist_box.insert(tk.END, word)
+            word_entry.delete(0, tk.END)
+
+            # Update JSON
+            update_watchlist(user_data["username"], word)
+
+    add_btn = tk.Button(dashboard_frame, text="Add Word", command=add_word)
+    add_btn.pack(pady=10)
+
+def update_watchlist(username, new_word):
+    file_name = "users.json"
+
+    with open(file_name, "r") as file:
+        data = json.load(file)
+
+    for user in data:
+        if user["username"] == username:
+            if "watchlist" not in user:
+                user["watchlist"] = []
+            user["watchlist"].append(new_word)
+
+    with open(file_name, "w") as file:
+        json.dump(data, file, indent=4)
+
 def register_command():
     register_frame = tk.Frame()
     register_frame.pack(fill='both', expand=True)
@@ -73,8 +130,16 @@ def register_command():
         lastname_entry.delete(0, tk.END)
         email_entry.delete(0, tk.END)
 
+        open_dashboard(user_data)
+
     signin = tk.Button(text='sign in', command=signin_command)
     signin.place(x=200, y=200)
+
+
+
+def signin_command():
+    ...
+
 
 register = tk.Button(text='Register', width=13, command=register_command)
 register.place(x=1080,y=30)
