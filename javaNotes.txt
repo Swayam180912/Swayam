@@ -9,3 +9,38 @@ int → float	                              (float) x
 float → int	                              (int) x
 int → String	                          String.valueOf(x)
 float → String	                          String.valueOf(x)
+
+
+ARRAYS
+
+1. ArrayList → dynamic size
+
+
+import java.util.ArrayList;
+
+ArrayList<Integer> list = new ArrayList<>();
+
+Can grow/shrink
+Has helpful methods: .add(), .remove(), .get()
+Can only store objects, so use Integer instead of int
+
+2. Array → fixed size
+
+int[] arr = new int[5];
+
+Size cannot change
+Faster
+Can store primitives directly (int, double, etc.)
+
+SCANNER
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int x = sc.nextInt();      // read an int
+        String s = sc.nextLine();  // read a string
+    }
+}
