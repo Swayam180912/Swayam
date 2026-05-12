@@ -1,30 +1,33 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Collections;
 
 public class Main {
 
-    public static String getName() {
-        System.out.print("Name: ");
-        Scanner sc = new Scanner(System.in);
-        String name = sc.nextLine();
-
-        return name;
-    }
-
-    public static Integer getAge() {
-        System.out.print("Age: ");
-        Scanner sc = new Scanner(System.in);
-        int age = sc.nextInt();
-
-        return age;
-    }
-
     public static void main(String[] args) {
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(getName());
-        list.add(getAge());
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Integer: ");
+        int x = sc.nextInt();
 
-        System.out.println(list.get(0) + ", " + list.get(1));
+        ArrayList<Integer> list = new ArrayList<>();
+        
+        while (true) {
+            if (x == 1) {
+                list.add(1);
+                break;
+            } else {
+                list.add(x % 2);
+                x /= 2;
+            }
 
+        }
+
+        Collections.reverse(list);
+
+        System.out.println(list);
+
+        for (i : list) {
+            // work here
+        }
     }
 }
