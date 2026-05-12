@@ -24,10 +24,11 @@ public class Main {
 
         Collections.reverse(list);
 
-        System.out.println(list);
+        String answer = "";
 
-        for (i : list) {
-            // work here
+        for (int i : list) {
+            answer += Integer.toString(i);
         }
+        System.out.println(answer);
     }
 }
